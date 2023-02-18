@@ -7,7 +7,8 @@ public class PlanTokenizer implements Tokenizer
 
     public PlanTokenizer(String src) throws LexicalError
     {
-        this.src = src;  pos = 0;
+        this.src = src;
+        pos = 0;
         computeNext();
     }
 
@@ -35,6 +36,13 @@ public class PlanTokenizer implements Tokenizer
         StringBuilder s = new StringBuilder();
         while (pos < src.length() && Character.isWhitespace(src.charAt(pos)))
             pos++;
+        if (pos + 1 < src.length() &&
+            ('#' == src.charAt(pos) ||
+            ('/' == src.charAt(pos) && '/' == src.charAt(pos+1)) ) )
+        {
+            while (pos < src.length())
+                pos++;
+        }
         if (pos == src.length())
         {
             next = null;
