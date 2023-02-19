@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -57,24 +58,28 @@ public class Main
 
         Player p1 = new Player("player1", var);
         Path file = Paths.get("src/construction_plan.txt");
-        try (BufferedReader reader = Files.newBufferedReader(file, charset))
+        try
         {
-            String line = null;
-            while ((line = reader.readLine()) != null)
+            List<String> lines = Files.readAllLines(file, charset);
             {
-                try
-                {
-                    Tokenizer tkz = new PlanTokenizer(line);
-                    PlanParser plan = new PlanParser(p1, tkz);
-                    Node p = plan.parse();
-                    StringBuilder s = new StringBuilder();
-                    p.prettyPrint(s);
-                    System.out.println(s);
-                }
-                catch (NoSuchElementException | LexicalError | SyntaxError | EvalError e)
-                {
-                    System.out.println(e.getMessage());
-                }
+//                lines.forEach(System.out::println);
+                    try
+                    {
+                        String content = Files.readString(file, charset);
+                        Tokenizer tkz = new PlanTokenizer(content);
+                        while(tkz.hasNextToken())
+                        {
+                            System.out.print(tkz.consume() + " ");
+                        }
+//                        PlanParser plan = new PlanParser(p1, tkz);
+//                        Node p = plan.parse();
+//                        StringBuilder s = new StringBuilder();
+//                        p.prettyPrint(s);
+//                        System.out.println(s);
+                    } catch (NoSuchElementException | LexicalError e)
+                    {
+                        System.out.println(e.getMessage());
+                    }
             }
         }
         catch (IOException e)

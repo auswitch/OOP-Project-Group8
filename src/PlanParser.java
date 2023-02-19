@@ -14,7 +14,7 @@ public class PlanParser implements Parser
     public Node parse() throws SyntaxError, LexicalError, EvalError
     {
         Node n = parsePlan();
-        if (tkz.hasNextToken())
+        if (tkz.hasNextToken())                         // if true have next word so convert tokenizer not all
             throw new SyntaxError("leftover token");
         return n;
     }
