@@ -12,6 +12,6 @@ public class Attack implements Node
     public void prettyPrint(StringBuilder s)
     {
         s.append("shoot " + dir + " ");
-        s.append(cost);
+        cost.prettyPrint(s);
     }
 }
