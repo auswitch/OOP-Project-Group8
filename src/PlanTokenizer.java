@@ -34,52 +34,54 @@ public class PlanTokenizer implements Tokenizer
     private void computeNext() throws LexicalError
     {
         StringBuilder s = new StringBuilder();
-        while (pos < src.length() && Character.isWhitespace(src.charAt(pos)))  // skip all space in string
+        while (pos < src.length() && Character.isWhitespace(src.charAt(pos)))
             pos++;
-        if (pos + 1 < src.length() &&                                               // if pos is # or // skip
-            ('#' == src.charAt(pos) ||
-            ('/' == src.charAt(pos) && '/' == src.charAt(pos+1)) ) )
-        {
-            while (pos < src.length() && src.charAt(pos) != '\n')
-            {
+        if (pos < src.length() && src.charAt(pos) == '#') {
+            // Skip the rest of the line after "#" character
+            while (pos < src.length() && src.charAt(pos) != '\n') {
                 pos++;
             }
-        }
-
-        if (pos == src.length())
-        {
-            next = null;
-            return;
-        }
-        // append c in stringbuilder
-        char c = src.charAt(pos);
-        if ('\n' == c)
-        {
-            pos++;
-        }
-        else if (Character.isDigit(c))                                           // if char is number
-        {
-            s.append(c);
-            for (pos++; pos < src.length() && Character.isDigit(src.charAt(pos)); pos++)
-                s.append(src.charAt(pos));
-        }
-        else if (Character.isLetter(c))                                     // if char is letter
-        {
-            s.append(c);
-            for (pos++; pos < src.length() && Character.isLetter(src.charAt(pos)); pos++)
-            {
-                s.append(src.charAt(pos));
+            // Skip the newline character after the "#" character
+            if (pos < src.length() && src.charAt(pos) == '\n') {
+                pos++;
             }
+            // Compute the next token after the "#" line
+            computeNext();
         }
-        else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^' ||
-                c == '=' || c == '(' || c == ')' || c == '{' || c == '}')
-        {
-            s.append(c);
-            pos++;
+        else if (pos < src.length()) {
+            char c = src.charAt(pos);
+            if ('\n' == c) {
+                pos++;
+            }
+            else if (Character.isDigit(c)) {
+                s.append(c);
+                for (pos++; pos < src.length() && Character.isDigit(src.charAt(pos)); pos++)
+                    s.append(src.charAt(pos));
+            }
+            else if (Character.isLetter(c)) {
+                s.append(c);
+                for (pos++; pos < src.length() && Character.isLetter(src.charAt(pos)); pos++)
+                {
+                    s.append(src.charAt(pos));
+                }
+            }
+            else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^' ||
+                    c == '=' || c == '(' || c == ')' || c == '{' || c == '}') {
+                s.append(c);
+                pos++;
+            }
+            else {
+                throw new LexicalError("unknown character: " + c);
+            }
+            next = s.toString();
         }
-        else throw new LexicalError("unknown character: " + c);
-        next = s.toString();
+        else {
+            next = null;
+        }
     }
+
+
+
 
     public boolean peek(String s)
     {

@@ -61,6 +61,10 @@ public class Main
         {
             String content = Files.readString(file, charset);
             Tokenizer tkz = new PlanTokenizer(content);
+//            while (tkz.hasNextToken())
+//            {
+//                System.out.print(tkz.consume() + " ");
+//            }
             PlanParser plan = new PlanParser(p1, tkz);
             Node p = plan.parse();
             StringBuilder s = new StringBuilder();
