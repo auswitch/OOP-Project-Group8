@@ -1,10 +1,10 @@
 public class IfState implements Node
 {
-    private Expr condition;
+    private Node condition;
     private Node thenStatement;
     private Node elseStatement;
 
-    public IfState(Expr condition, Node thenStatement, Node elseStatement)
+    public IfState(Node condition, Node thenStatement, Node elseStatement)
     {
         this.condition = condition;
         this.thenStatement = thenStatement;

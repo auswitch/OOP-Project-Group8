@@ -1,14 +1,15 @@
 public class Move implements Node
 {
-    private String dir;
+    private Node dir;
 
-    public Move(String dir)
+    public Move(Node dir)
     {
         this.dir = dir;
     }
 
     public void prettyPrint(StringBuilder s)
     {
-        s.append("move " + dir);
+        s.append("move ");
+        dir.prettyPrint(s);
     }
 }

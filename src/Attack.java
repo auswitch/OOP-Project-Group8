@@ -1,9 +1,9 @@
 public class Attack implements Node
 {
-    private String dir;
+    private Node dir;
     private Expr cost;
 
-    public Attack(String dir, Expr cost)
+    public Attack(Node dir, Expr cost)
     {
         this.dir = dir;
         this.cost = cost;
@@ -11,7 +11,8 @@ public class Attack implements Node
 
     public void prettyPrint(StringBuilder s)
     {
-        s.append("shoot " + dir + " ");
+        s.append("shoot " + " ");
         cost.prettyPrint(s);
+        dir.prettyPrint(s);
     }
 }

@@ -1,9 +1,9 @@
 public class WhileState implements Node
 {
-    private Expr condition;
+    private Node condition;
     private Node body;
 
-    public WhileState(Expr condition, Node body)
+    public WhileState(Node condition, Node body)
     {
         this.condition = condition;
         this.body = body;

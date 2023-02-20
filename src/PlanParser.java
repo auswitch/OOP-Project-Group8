@@ -11,7 +11,45 @@ public class PlanParser implements Parser
         this.tkz = tkz;
     }
 
-    public Node parse() throws SyntaxError, LexicalError, EvalError
+    public static boolean isIdentifier(String s)
+    {
+        // Check that the string is not a reserved word
+        switch (s)
+        {
+            case "collect":
+            case "done":
+            case "down":
+            case "downleft":
+            case "downright":
+            case "else":
+            case "if":
+            case "invest":
+            case "move":
+            case "nearby":
+            case "opponent":
+            case "relocate":
+            case "shoot":
+            case "then":
+            case "up":
+            case "upleft":
+            case "upright":
+            case "while":
+                return false;
+            default:
+                break;
+        }
+
+        // Check that the string starts with a letter
+        char firstChar = s.charAt(0);
+        if (!Character.isLetter(firstChar))
+        {
+            return false;
+        }
+        return true;
+    }
+
+
+        public Node parse() throws SyntaxError, LexicalError, EvalError
     {
         Node n = parsePlan();
         if (tkz.hasNextToken())                         // if true have next word so convert tokenizer not all
@@ -33,57 +71,66 @@ public class PlanParser implements Parser
         Node n;
         if(tkz.peek("{"))
         {
-            n = parseBlock();
+            return parseBlock();
         }
         else if (tkz.peek("if"))
         {
-            n = parseIf();
+            return parseIf();
         }
         else if (tkz.peek("while"))
         {
-            n = parseWhile();
+            return parseWhile();
         }
         else
         {
-            n = parseCommand();
+            return parseCommand();
         }
-        return n;
     }
 
     // Command -> AssignmentStatement | ActionCommand
-    // ActionCommand -> done | relocate | MoveCommand | RegionCommand | AttackCommand
+
     private Node parseCommand() throws SyntaxError, LexicalError
     {
-        Node n;
+        if(isIdentifier(tkz.peek()))
+        {
+            return parseAssignment();
+        }
+        else
+        {
+            return parseAction();
+        }
+    }
+    // ActionCommand -> done | relocate | MoveCommand | RegionCommand | AttackCommand
+    private Node parseAction() throws LexicalError, SyntaxError
+    {
         if(tkz.peek("done"))
         {
             tkz.consume();
-            n = new Done();
+            return new Done();
         }
         else if (tkz.peek("relocate"))
         {
             tkz.consume();
-            n = new Relocate();
+            return new Relocate();
         }
         else if (tkz.peek("move"))
         {
             tkz.consume();
-            n = parseMove();
+            return parseMove();
         }
         else if (tkz.peek("invest") || tkz.peek("collect"))
         {
-            n = parseRegion();
+            return parseRegion();
         }
         else if (tkz.peek("shoot"))
         {
             tkz.consume();
-            n = parseAttack();
+            return parseAttack();
         }
         else
         {
-            n = parseAssignment();
+            throw new SyntaxError("Unknown command: " + tkz);
         }
-        return n;
     }
 
     // AssignmentStatement -> <identifier> = Expression
@@ -116,9 +163,25 @@ public class PlanParser implements Parser
     }
 
     // Direction -> up | down | upleft | upright | downleft | downright
-    private String parseDir() throws LexicalError
+    private Node parseDir() throws LexicalError
     {
-        return tkz.consume();
+        String direction = tkz.consume();
+        switch (direction) {
+            case "up":
+                return Direction.up;
+            case "down":
+                return Direction.down;
+            case "upleft":
+                return Direction.upleft;
+            case "upright":
+                return Direction.upright;
+            case "downleft":
+                return Direction.downleft;
+            case "downright":
+                return Direction.downright;
+            default:
+                throw new AssertionError("Unknown direction: " + direction);
+        }
     }
 
     // BlockStatement -> { Statement* }
@@ -126,12 +189,9 @@ public class PlanParser implements Parser
     {
         LinkedList<Node> statements = new LinkedList<>();
         tkz.consume("{");
-        if(!tkz.peek("}"))
+        while(!tkz.peek("}"))
         {
-            while (!tkz.peek("}"))
-            {
                 statements.add(parseStatement());
-            }
         }
         tkz.consume("}");
         return new BlockState(statements);
@@ -142,7 +202,7 @@ public class PlanParser implements Parser
     {
         tkz.consume("if");
         tkz.consume("(");
-        Expr condition = parseE();
+        Node condition = parseE();
         tkz.consume(")");
         tkz.consume("then");
         Node thenStatement = parseStatement();
@@ -156,7 +216,7 @@ public class PlanParser implements Parser
     {
         tkz.consume("while");
         tkz.consume("(");
-        Expr condition = parseE();
+        Node condition = parseE();
         tkz.consume(")");
         Node body = parseStatement();
         return new WhileState(condition, body);
@@ -235,15 +295,25 @@ public class PlanParser implements Parser
             tkz.consume(")");
             return e;
         }
+        else if(tkz.peek("opponent"))
+        {
+            tkz.consume();
+            return new InfoExpr(player, "opponent", null);
+        }
+        else if (tkz.peek("nearby"))
+        {
+            tkz.consume();
+            return new InfoExpr(player, "nearby", parseDir());
+        }
         else
         {
-            return parseInfo();
+            throw new SyntaxError("Unexpected token: " + tkz.peek());
         }
     }
 
     // InfoExpression -> opponent | nearby Direction
-    private Expr parseInfo() throws LexicalError, SyntaxError
-    {
-        return new InfoExpr(player, tkz.consume(), tkz.hasNextToken() ? parseDir() : null);
-    }
+//    private Expr parseInfo() throws LexicalError, SyntaxError
+//    {
+//        return new InfoExpr(player, tkz.consume(), tkz.hasNextToken() ? parseDir() : null);
+//    }
 }

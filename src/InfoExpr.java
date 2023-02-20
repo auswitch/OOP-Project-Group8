@@ -3,10 +3,11 @@ import java.util.Map;
 public class InfoExpr implements Expr
 {
     private Player player;
-    private String expr, dir;
+    private String expr;
+    private Node dir;
     private Long loc;
 
-    public InfoExpr(Player player, String expr, String dir)
+    public InfoExpr(Player player, String expr, Node dir)
     {
         this.player = player;
         this.expr = expr;
@@ -26,6 +27,9 @@ public class InfoExpr implements Expr
     {
         s.append(expr);
         if(dir != null)
+        {
             s.append(dir);
+        }
+        dir.prettyPrint(s);
     }
 }
