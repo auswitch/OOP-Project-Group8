@@ -52,7 +52,7 @@ public class PlanParser implements Parser
 
     // Command -> AssignmentStatement | ActionCommand
     // ActionCommand -> done | relocate | MoveCommand | RegionCommand | AttackCommand
-    private Node parseCommand() throws SyntaxError, LexicalError, EvalError
+    private Node parseCommand() throws SyntaxError, LexicalError
     {
         Node n;
         if(tkz.peek("done"))
@@ -126,9 +126,12 @@ public class PlanParser implements Parser
     {
         LinkedList<Node> statements = new LinkedList<>();
         tkz.consume("{");
-        while (!tkz.peek("}"))
+        if(!tkz.peek("}"))
         {
-            statements.add(parseStatement());
+            while (!tkz.peek("}"))
+            {
+                statements.add(parseStatement());
+            }
         }
         tkz.consume("}");
         return new BlockState(statements);
@@ -143,12 +146,8 @@ public class PlanParser implements Parser
         tkz.consume(")");
         tkz.consume("then");
         Node thenStatement = parseStatement();
-        Node elseStatement = null;
-        if (tkz.peek("else"))
-        {
-            tkz.consume("else");
-            elseStatement = parseStatement();
-        }
+        tkz.consume("else");
+        Node elseStatement = parseStatement();
         return new IfState(condition, thenStatement, elseStatement);
     }
 
