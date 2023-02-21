@@ -226,16 +226,12 @@ public class PlanParser implements Parser
     private Expr parseE() throws LexicalError, SyntaxError
     {
         Expr e = parseT();
-        while (tkz.peek("+"))
+        while (tkz.hasNextToken() && (tkz.peek("+") || tkz.peek("-")))
         {
             tkz.consume();
             e = new BinaryArithExpr(e, "+", parseT());
         }
-        while (tkz.peek("-"))
-        {
-            tkz.consume();
-            e = new BinaryArithExpr(e, "-", parseT());
-        }
+        //System.out.println("Parsed expression: " + e.toString());
         return e;
     }
 
@@ -261,6 +257,7 @@ public class PlanParser implements Parser
                 tkz.consume();
                 e = new BinaryArithExpr(e, "%", parseF());
             }
+            //System.out.println("Parsed term: " + e.toString());
         }
         return e;
     }
@@ -303,7 +300,13 @@ public class PlanParser implements Parser
         else if (tkz.peek("nearby"))
         {
             tkz.consume();
-            return new InfoExpr(player, "nearby", parseDir());
+            Expr e =  new InfoExpr(player, "nearby", parseDir());
+            if (tkz.peek("+") || tkz.peek("-") || tkz.peek("*") || tkz.peek("/") || tkz.peek("%"))
+            {
+                String op = tkz.consume();
+                e = new BinaryArithExpr(e, op, parseF());
+            }
+            return e;
         }
         else
         {
