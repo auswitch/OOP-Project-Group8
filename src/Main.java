@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -61,17 +62,28 @@ public class Main
         {
             String content = Files.readString(file, charset);
             Tokenizer tkz = new PlanTokenizer(content);
-//            while (tkz.hasNextToken())
-//            {
-//                System.out.print(tkz.consume() + " ");
-//            }
             PlanParser plan = new PlanParser(p1, tkz);
-            Node p = plan.parse();
-            StringBuilder s = new StringBuilder();
-            p.prettyPrint(s);
-            System.out.println(s);
+            LinkedList<Node> pList = new LinkedList<>();
+            while (tkz.hasNextToken())
+            {
+                try
+                {
+                    pList.add(plan.parse());
+                }
+                catch (NoSuchElementException | LexicalError | SyntaxError | EvalError e)
+                {
+                    System.out.println(e.getMessage());
+                }
+            }
+            while (!pList.isEmpty())
+            {
+                StringBuilder s = new StringBuilder();
+                pList.peek().prettyPrint(s);
+                System.out.println(s);
+                pList.removeFirst();
+            }
         }
-        catch (NoSuchElementException | LexicalError | SyntaxError | EvalError e)
+        catch (NoSuchElementException | LexicalError e)
         {
             System.out.println(e.getMessage());
         }

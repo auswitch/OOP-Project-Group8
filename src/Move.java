@@ -9,7 +9,7 @@ public class Move implements Node
 
     public void prettyPrint(StringBuilder s)
     {
-        s.append("move ");
+        s.append("move");
         dir.prettyPrint(s);
     }
 }
