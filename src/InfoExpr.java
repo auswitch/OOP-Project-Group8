@@ -28,8 +28,7 @@ public class InfoExpr implements Expr
         s.append(expr);
         if(dir != null)
         {
-            s.append(dir);
+            dir.prettyPrint(s);
         }
-        dir.prettyPrint(s);
     }
 }

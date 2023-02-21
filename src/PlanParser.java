@@ -48,8 +48,7 @@ public class PlanParser implements Parser
         return true;
     }
 
-
-        public Node parse() throws SyntaxError, LexicalError, EvalError
+    public Node parse() throws SyntaxError, LexicalError, EvalError
     {
         Node n = parsePlan();
         if (tkz.hasNextToken())                         // if true have next word so convert tokenizer not all
@@ -68,7 +67,6 @@ public class PlanParser implements Parser
     // Statement -> Command | BlockStatement | IfStatement | WhileStatement
     private Node parseStatement() throws SyntaxError, LexicalError, EvalError
     {
-        Node n;
         if(tkz.peek("{"))
         {
             return parseBlock();
@@ -88,7 +86,6 @@ public class PlanParser implements Parser
     }
 
     // Command -> AssignmentStatement | ActionCommand
-
     private Node parseCommand() throws SyntaxError, LexicalError
     {
         if(isIdentifier(tkz.peek()))
@@ -100,6 +97,7 @@ public class PlanParser implements Parser
             return parseAction();
         }
     }
+
     // ActionCommand -> done | relocate | MoveCommand | RegionCommand | AttackCommand
     private Node parseAction() throws LexicalError, SyntaxError
     {
@@ -231,7 +229,6 @@ public class PlanParser implements Parser
             tkz.consume();
             e = new BinaryArithExpr(e, "+", parseT());
         }
-        //System.out.println("Parsed expression: " + e.toString());
         return e;
     }
 
@@ -257,7 +254,6 @@ public class PlanParser implements Parser
                 tkz.consume();
                 e = new BinaryArithExpr(e, "%", parseF());
             }
-            //System.out.println("Parsed term: " + e.toString());
         }
         return e;
     }
@@ -281,6 +277,14 @@ public class PlanParser implements Parser
         {
             return new Number(Long.parseLong(tkz.consume()));
         }
+        else if(tkz.peek("opponent"))
+        {
+            return new InfoExpr(player, tkz.consume(), null);
+        }
+        else if (tkz.peek("nearby"))
+        {
+            return new InfoExpr(player, tkz.consume(), parseDir());
+        }
         else if (tkz.peek().matches(".*[A-Za-z].*"))
         {
             return new Identifier(tkz.consume());
@@ -290,22 +294,6 @@ public class PlanParser implements Parser
             tkz.consume();
             Expr e = parseE();
             tkz.consume(")");
-            return e;
-        }
-        else if(tkz.peek("opponent"))
-        {
-            tkz.consume();
-            return new InfoExpr(player, "opponent", null);
-        }
-        else if (tkz.peek("nearby"))
-        {
-            tkz.consume();
-            Expr e =  new InfoExpr(player, "nearby", parseDir());
-            if (tkz.peek("+") || tkz.peek("-") || tkz.peek("*") || tkz.peek("/") || tkz.peek("%"))
-            {
-                String op = tkz.consume();
-                e = new BinaryArithExpr(e, op, parseF());
-            }
             return e;
         }
         else

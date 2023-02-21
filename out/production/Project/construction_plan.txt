@@ -1,5 +1,4 @@
-t = t + 1  # keeping track of the turn number
-m = 0  # number of random moves
+
 while (deposit) { # still our region
   if (deposit - 100)
   then collect (deposit / 4)  # collect 1/4 of available deposit
@@ -12,7 +11,7 @@ while (deposit) { # still our region
     if (opponentLoc % 10 - 5) then move downleft
     else if (opponentLoc % 10 - 4) then move down
     else if (opponentLoc % 10 - 3) then move downright
-    else if (opponentLoc % 10 - 2) then move right
+    else if (opponentLoc % 10 - 2) then move upleft
     else if (opponentLoc % 10 - 1) then move upright
     else move up
   else if (opponentLoc)
@@ -52,5 +51,3 @@ while (deposit) { # still our region
     m = m + 1
   }
 }  # end while
-# city crew on a region belonging to nobody, so claim it
-if (budget - 1) then invest 1 else {}
