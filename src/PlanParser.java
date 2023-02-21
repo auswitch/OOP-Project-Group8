@@ -51,8 +51,8 @@ public class PlanParser implements Parser
     public Node parse() throws SyntaxError, LexicalError, EvalError
     {
         Node n = parsePlan();
-//        if (tkz.hasNextToken())                         // if true have next word so convert tokenizer not all
-//            throw new SyntaxError("leftover token");
+        if (tkz.hasNextToken())                         // if true have next word so convert tokenizer not all
+            throw new SyntaxError("leftover token");
         return n;
     }
 
@@ -271,6 +271,7 @@ public class PlanParser implements Parser
     }
 
     // Power -> <number> | <identifier> | ( Expression ) | InfoExpression
+    // InfoExpression -> opponent | nearby Direction
     private Expr parseP() throws LexicalError, SyntaxError
     {
         if (tkz.peek().matches(".*[0-9].*"))
@@ -301,10 +302,4 @@ public class PlanParser implements Parser
             throw new SyntaxError("Unexpected token: " + tkz.peek());
         }
     }
-
-    // InfoExpression -> opponent | nearby Direction
-//    private Expr parseInfo() throws LexicalError, SyntaxError
-//    {
-//        return new InfoExpr(player, tkz.consume(), tkz.hasNextToken() ? parseDir() : null);
-//    }
 }
