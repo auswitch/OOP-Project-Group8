@@ -239,8 +239,7 @@ public class PlanParser implements Parser
         Expr e = parseT();
         while (tkz.hasNextToken() && (tkz.peek("+") || tkz.peek("-")))
         {
-            tkz.consume();
-            e = new BinaryArithExpr(e, "+", parseT());
+            e = new BinaryArithExpr(e, tkz.consume(), parseT());
         }
         return e;
     }
