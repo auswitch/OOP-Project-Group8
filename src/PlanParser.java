@@ -61,7 +61,20 @@ public class PlanParser implements Parser
     {
         if(!tkz.hasNextToken())
             throw new SyntaxError("You must have construction plan !");
-        return parseStatement();
+        State all = new State(parseStatement(), null);
+        State current = null;
+        while (tkz.hasNextToken())
+        {
+            if(all.getNext() == null)
+            {
+                current = new State(parseStatement(), null);
+                all.nextState(current);
+            }
+            State next = new State(parseStatement(), null);
+            current.nextState(next);
+            current = next;
+        }
+        return all;
     }
 
     // Statement -> Command | BlockStatement | IfStatement | WhileStatement
